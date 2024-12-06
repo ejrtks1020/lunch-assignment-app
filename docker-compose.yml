@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11.1
+    ports:
+      - 3305:3306
+    # volumes:
+    #   - ./db/conf.d:/etc/mysql/mariadb.conf.d # mariadb 설정 파일
+    #   - ./db/data:/var/lib/mysql # data dir
+    #   - ./db/initdb.d:/docker-entrypoint-initdb.d
+    # env_file: .env
+    environment:
+      TZ: Asia/Seoul
+      MARIADB_USER: knh
+      MARIADB_PASSWORD: knh1!
+      MARIADB_ROOT_PASSWORD: knh1!
+      MARIADB_DATABASE: lunch
+    restart: always
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend/app:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
